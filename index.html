@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Pages Example</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Pages Example</title>
 </head>
 <body style="background-color: ${process.env.STAGE_BG_COLOR};">
-  <h1>Welcome to the Stage Environment!</h1>
-  <p>This is the content for the Stage environment. The background color is set dynamically!</p>
+    <h1>Welcome to the Environment</h1>
+    <p>This page is currently being served from: <span id="branch-name"></span> branch.</p>
+
+    <script>
+        // Detect de huidige branch
+        const branch = '${{ github.ref }}'.split('/').pop(); // Dit haalt de branchnaam uit de GitHub ref
+        document.getElementById('branch-name').textContent = branch;
+
+        // Controleer of we de juiste achtergrondkleur krijgen
+        console.log("Background color for this environment: " + process.env.STAGE_BG_COLOR);
+    </script>
 </body>
 </html>
