@@ -1,0 +1,34 @@
+name: Deploy to Environment
+
+on:
+  push:
+    branches:
+      - main
+      - stage
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/stage" ]; then
+            echo "REACT_APP_BG_COLOR=${{ secrets.STAGE_BG_COLOR }}" >> $GITHUB_ENV
+          else
+            echo "REACT_APP_BG_COLOR=${{ secrets.PRODUCTION_BG_COLOR }}" >> $GITHUB_ENV
+          fi
+
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_dir: ./build
+          github_token: ${{ secrets.GITHUB_TOKEN }}
