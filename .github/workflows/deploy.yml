@@ -1,34 +1,39 @@
-name: Deploy to Environment
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
-      - stage
+      - main     # Voor de productie-omgeving
+      - stage    # Voor de stage-omgeving
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Stap 1: Checkout de code van de repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set environment variables
+      # Stap 2: Stel de omgevingsvariabelen in voor de achtergrondkleur
+      - name: Set background color environment variable
         run: |
           if [ "${{ github.ref }}" == "refs/heads/stage" ]; then
-            echo "REACT_APP_BG_COLOR=${{ secrets.STAGE_BG_COLOR }}" >> $GITHUB_ENV
+            echo "STAGE_BG_COLOR=${{ secrets.STAGE_BG_COLOR }}" >> $GITHUB_ENV
           else
-            echo "REACT_APP_BG_COLOR=${{ secrets.PRODUCTION_BG_COLOR }}" >> $GITHUB_ENV
+            echo "PRODUCTION_BG_COLOR=${{ secrets.PRODUCTION_BG_COLOR }}" >> $GITHUB_ENV
           fi
 
-      - name: Install dependencies and build
-        run: |
-          npm install
-          npm run build
+      # Stap 3: Installeer dependencies en bouw de applicatie
+      - name: Install dependencies
+        run: npm install
 
+      - name: Build the project
+        run: npm run build
+
+      # Stap 4: Deploy naar GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: ./build
+          publish_dir: ./build  # Als je een build folder gebruikt, anders wijzig je dit naar './' voor root
           github_token: ${{ secrets.GITHUB_TOKEN }}
